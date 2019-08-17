@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ArPiRobot Mobile Drive Station</string>
+
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="log">Log</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
+</resources>

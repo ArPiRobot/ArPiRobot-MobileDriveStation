@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mnuConnect"
+        android:icon="@drawable/ic_connect"
+        android:title="@string/connect"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/mnuDisconnect"
+        android:icon="@drawable/ic_disconnect"
+        android:title="@string/disconnect"
+        android:visible="false"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/mnuLog"
+        android:icon="@drawable/ic_logfile"
+        android:title="@string/log"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/mnuPreferences"
+        android:title="@string/settings"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/mnuAbout"
+        android:title="@string/about"
+        app:showAsAction="never" />
+</menu>
