@@ -2,16 +2,33 @@ package com.marcus.arpirobotmobiledrivestation;
 
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
+
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static MainActivity instance = null;
+
+    public String robotLogText = "";
+    public String dsLogText = "";
+    public SharedPreferences prefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(MainActivity.instance != null){
+            finish();
+            return;
+        }
+
+        MainActivity.instance = this;
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
@@ -30,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             case R.id.mnuLog:
-                //startActivity(new Intent(this, LogActivity.class));
+                startActivity(new Intent(this, LogActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
