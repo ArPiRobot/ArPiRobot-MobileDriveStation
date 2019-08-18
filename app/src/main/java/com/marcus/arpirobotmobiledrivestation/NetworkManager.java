@@ -1,36 +1,33 @@
 package com.marcus.arpirobotmobiledrivestation;
 
+import android.util.Log;
+
 import com.google.common.primitives.Bytes;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
-import java.net.SocketException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.bytes.ByteArrayDecoder;
-import io.netty.handler.codec.bytes.ByteArrayEncoder;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
+public class NetworkManager{
+    private ExecutorService asyncExecutor = Executors.newFixedThreadPool(2);
 
-public class NetworkManager {
+    private Socket commandSocket = null,
+                         netTableSocket = null,
+                         logSocket = null;
+    private DatagramSocket controllerSocket = null;
+
+    private OutputStream commandSocketOut, netTableSocketOut;
+    private InputStream netTableSocketIn, logSocketIn;
 
     // Networking settings
     public final static int CONTROLLER_PORT = 8090;
@@ -58,15 +55,7 @@ public class NetworkManager {
 
     private String logBuffer = "";
 
-    private EventLoopGroup workerGroup;
-    private Channel commandChannel, netTableChannel, logChannel;
-    private DatagramSocket controllerSocket;
-
-    private ExecutorService asyncExecutor = Executors.newFixedThreadPool(2);
-
-    public void connect(String address) {
-
-        // Reset state
+    public void connect(){
         if(isConnected) return;
         hasRespondedToDisconnect = false;
 
@@ -78,123 +67,51 @@ public class NetworkManager {
 
         logBuffer = "";
 
-        // Do not block while bootstrapping
         asyncExecutor.execute(() -> {
-            workerGroup = new NioEventLoopGroup();
-
-            Bootstrap cmdBootstrap = new Bootstrap();
-            cmdBootstrap.group(workerGroup);
-            cmdBootstrap.channel(NioSocketChannel.class);
-            cmdBootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIMEOUT);
-            cmdBootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                protected void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline()
-                            .addLast(new StringEncoder(StandardCharsets.UTF_8))
-                            .addLast(new StringDecoder(StandardCharsets.UTF_8))
-                            .addLast(new CommandHandler());
-                }
-            });
-
-            Bootstrap netTableBootstrap = new Bootstrap();
-            netTableBootstrap.group(workerGroup);
-            netTableBootstrap.channel(NioSocketChannel.class);
-            netTableBootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIMEOUT);
-            netTableBootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                protected void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline()
-                            .addLast(new ByteArrayEncoder())
-                            .addLast(new ByteArrayDecoder())
-                            .addLast(new NetTableHandler());
-                }
-            });
-
-            Bootstrap logBootstrap = new Bootstrap();
-            logBootstrap.group(workerGroup);
-            logBootstrap.channel(NioSocketChannel.class);
-            logBootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, CONNECT_TIMEOUT);
-            logBootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                protected void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline()
-                            .addLast(new StringEncoder(StandardCharsets.UTF_8))
-                            .addLast(new StringDecoder(StandardCharsets.UTF_8))
-                            .addLast(new LogHandler());
-                }
-            });
-
-            String host = MainActivity.instance.getRobotAddress();
-            ChannelFuture cmdChannelFuture = cmdBootstrap.connect(host, COMMAND_PORT);
-            ChannelFuture netTableChannelFuture = netTableBootstrap.connect(host, NET_TABLE_PORT);
-            ChannelFuture logChannelFuture = logBootstrap.connect(host, LOG_PORT);
-
-            // Wait for all to connect (don't use sync b/c it won't allow connect timeout to work)
             try {
-                cmdChannelFuture.await();
-                netTableChannelFuture.await();
-                logChannelFuture.await();
-            }catch(InterruptedException e) {
+                commandSocket = new Socket();
+                commandSocket.connect(new InetSocketAddress(MainActivity.instance.getRobotAddress(), COMMAND_PORT), CONNECT_TIMEOUT);
 
-            }
+                netTableSocket = new Socket();
+                netTableSocket.connect(new InetSocketAddress(MainActivity.instance.getRobotAddress(), NET_TABLE_PORT), CONNECT_TIMEOUT);
 
-            if(cmdChannelFuture.isCancelled() ||
-                    netTableChannelFuture.isCancelled() ||
-                    logChannelFuture.isCancelled()) {
-                return; // Connect canceled
-            }
 
-            if(cmdChannelFuture.isDone() && cmdChannelFuture.isSuccess()) {
-                commandChannel = cmdChannelFuture.channel();
-            }
+                logSocket = new Socket();
+                logSocket.connect(new InetSocketAddress(MainActivity.instance.getRobotAddress(), LOG_PORT), CONNECT_TIMEOUT);
 
-            if(netTableChannelFuture.isDone() && netTableChannelFuture.isSuccess()) {
-                netTableChannel = netTableChannelFuture.channel();
-            }
+                commandSocketOut = commandSocket.getOutputStream();
+                netTableSocketOut = netTableSocket.getOutputStream();
 
-            if(logChannelFuture.isDone() && logChannelFuture.isSuccess()) {
-                logChannel = logChannelFuture.channel();
-            }
+                logSocketIn = logSocket.getInputStream();
+                netTableSocketIn = netTableSocket.getInputStream();
 
-            // Make sure both connected. If not disconnect.
-            if(commandChannel == null || netTableChannel == null || logChannel == null) {
-                MainActivity.instance.logError("Failed to connect to one or more ports.");
-                doDisconnect();
-                MainActivity.instance.runOnUiThread(() -> {
-                    MainActivity.instance.failedToConnectToRobot();
-                });
-                return;
-            }
-
-            // Setup UDP for controller port
-            try {
+                // Connect UDP socket last (only if exception not thrown = all TCp connections successful)
                 controllerSocket = new DatagramSocket();
                 controllerSocket.connect(new InetSocketAddress(
                         MainActivity.instance.getRobotAddress(),
                         CONTROLLER_PORT
                 ));
-            } catch (SocketException e) {
-                // Failed to setup UDP (for some unknown reason)
+
+                isConnected = true;
+
+                MainActivity.instance.runOnUiThread(() -> {
+                    MainActivity.instance.connectedToRobot();
+                });
+
+            }catch (IOException e){
                 doDisconnect();
+                e.printStackTrace();
                 MainActivity.instance.runOnUiThread(() -> {
                     MainActivity.instance.failedToConnectToRobot();
                 });
-                return;
             }
 
-            // Connected successfully
-            isConnected = true;
-            MainActivity.instance.runOnUiThread(() -> {
-                MainActivity.instance.connectedToRobot();
-            });
-
-            // Already running async
-            periodicConnectivityCheck();
-
+            // Already async. Run periodic reads and connectivity checks
+            periodicReadAndConnectivityCheck();
         });
     }
 
-    public void disconnect(boolean userInitiated) {
+    public void disconnect(boolean userInitiated){
         if(!isConnected || hasRespondedToDisconnect) return;
         hasRespondedToDisconnect = true;
 
@@ -207,8 +124,8 @@ public class NetworkManager {
         });
     }
 
-    public boolean isConnected() {
-        return isConnected;
+    public boolean isConnected(){
+        return this.isConnected;
     }
 
     public void sendControllerData(byte[] data) {
@@ -227,18 +144,15 @@ public class NetworkManager {
 
     public void sendCommand(String command) {
         if(isConnected) {
-            ChannelFuture f = commandChannel.writeAndFlush(command);
-            f.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if(!future.isSuccess()) {
-                        // Write failed. Disconnect.
-                        if(!hasRespondedToDisconnect)
-                            MainActivity.instance.logError("Failed to write to command port.");
-                        disconnect(false);
-                    }
-                }
-            });
+            try{
+                commandSocketOut.write(command.getBytes(StandardCharsets.UTF_8));
+                commandSocketOut.flush();
+            }catch(IOException e){
+                // Write failed. Disconnect.
+                if(!hasRespondedToDisconnect)
+                    MainActivity.instance.logError("Failed to write to command port.");
+                disconnect(false);
+            }
         }
     }
 
@@ -253,60 +167,47 @@ public class NetworkManager {
 
     public void sendNTRaw(byte[] data) {
         if(isConnected) {
-            ChannelFuture f = netTableChannel.writeAndFlush(data);
-            f.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if(!future.isSuccess()) {
-                        // Write failed. Disconnect.
-                        if(!hasRespondedToDisconnect)
-                            MainActivity.instance.logError("Failed to write to command port.");
-                        disconnect(false);
-                    }
-                }
-            });
+            try{
+                commandSocketOut.write(data);
+                commandSocketOut.flush();
+            }catch(IOException e){
+                // Write failed. Disconnect.
+                if(!hasRespondedToDisconnect)
+                    MainActivity.instance.logError("Failed to write to net table port.");
+                disconnect(false);
+            }
         }
     }
 
 
-    private void doDisconnect() {
+
+    private void doDisconnect(){
         if(!isConnected) return;
 
         isConnected = false;
 
-        //DriveStation.netTable.abortSync(false);
+        MainActivity.instance.netTable.abortSync(false);
 
-        if(commandChannel != null)
-            commandChannel.close();
+        try{
+            if(commandSocket != null)
+                commandSocket.close();
+            if(netTableSocket != null)
+                netTableSocket = null;
+            if(logSocket != null)
+                logSocket.close();
+            if(controllerSocket != null)
+                controllerSocket.close();
 
-        if(netTableChannel != null)
-            netTableChannel.close();
-
-        if(controllerSocket != null)
-            controllerSocket.close();
-
-        if(logChannel != null)
-            logChannel.close();
-
-        try {
-            if(commandChannel != null)
-                commandChannel.closeFuture().sync();
-            if(netTableChannel != null)
-                netTableChannel.closeFuture().sync();
-            if(logChannel != null)
-                logChannel.closeFuture().sync();
-        } catch (InterruptedException e) {
-
+            commandSocket = null;
+            commandSocketOut = null;
+            netTableSocket = null;
+            netTableSocketOut = null;
+            netTableSocketIn = null;
+            logSocketIn = null;
+            controllerSocket = null;
+        }catch(IOException e){
+            e.printStackTrace();
         }
-
-        commandChannel = null;
-        netTableChannel = null;
-        controllerSocket = null;
-        logChannel = null;
-
-        workerGroup.shutdownGracefully();
-        workerGroup = null;
-
     }
 
     private void handleNetTableData(byte[] newData) {
@@ -318,11 +219,11 @@ public class NetworkManager {
         while((endPos = netTableReadBuffer.indexOf((byte)'\n')) != -1) {
             List<Byte> subset = netTableReadBuffer.subList(0, endPos + 1);
             if(matchData(subset, NT_SYNC_START_DATA)) {
-                //netTableInSync = true;
-                //DriveStation.netTable.startSync();
+                netTableInSync = true;
+                MainActivity.instance.netTable.startSync();
             }else if(matchData(subset, NT_SYNC_STOP_DATA)) {
-                //DriveStation.netTable.finishSync(syncKeys, syncValues);
-                //netTableInSync = false;
+                MainActivity.instance.netTable.finishSync(syncKeys, syncValues);
+                netTableInSync = false;
             }else {
                 int delimPos = netTableReadBuffer.indexOf((byte)255);
 
@@ -337,7 +238,7 @@ public class NetworkManager {
                         syncKeys.add(key);
                         syncValues.add(value);
                     }else {
-                        //DriveStation.netTable.setFromRobot(key, value);
+                        MainActivity.instance.netTable.setFromRobot(key, value);
                     }
                 }
             }
@@ -358,139 +259,69 @@ public class NetworkManager {
         return true;
     }
 
-
-    @SuppressWarnings("unused")
-    private void printBytes(List<Byte> subset) {
-        String str = "";
-        for(Byte b : subset) {
-            str += (byte)b;
-            str += ",";
-        }
-        System.out.println("[PRINT_DATA]: " + str);
-    }
-
-    @SuppressWarnings("unused")
-    private void printBytes(byte[] subset) {
-        String str = "";
-        for(byte b : subset) {
-            str += b;
-            str += ",";
-        }
-        System.out.println("[PRINT_DATA]: " + str);
-    }
-
-    private void periodicConnectivityCheck() {
-        while(isConnected) {
-            // If the remote host closes the connection an exception is not always fired, but
-            //   isOpen will return false. Trigger a disconnect event if this occurs.
-            if(!commandChannel.isOpen()) {
-                // Log the first failure
-                if(!hasRespondedToDisconnect) {
-                    MainActivity.instance.logError("Command client - Connection closed by remote host.");
+    private void periodicReadAndConnectivityCheck(){
+        while(isConnected){
+            try{
+                if(!commandSocket.getInetAddress().isReachable(100)){
+                    // Handle command client disconnect
+                    if(!hasRespondedToDisconnect){
+                        MainActivity.instance.logError("Command client - Connection closed by remote host.");
+                    }
+                    disconnect(false);
+                    break;
                 }
 
-                // Closed by remote endpoint
-                disconnect(false);
-                break;
-            }else if(!netTableChannel.isOpen()) {
-                // Log the first failure
-                if(!hasRespondedToDisconnect) {
-                    MainActivity.instance.logError("Net table client - Connection closed by remote host.");
+                if(!netTableSocket.getInetAddress().isReachable(100)){
+                    // Handle command client disconnect
+                    if(!hasRespondedToDisconnect){
+                        MainActivity.instance.logError("Net table client - Connection closed by remote host.");
+                    }
+                    disconnect(false);
+                    break;
                 }
 
-                // Closed by remote endpoint
-                disconnect(false);
-                break;
-            }else if(!logChannel.isOpen()) {
-                // Log the first failure
-                if(!hasRespondedToDisconnect) {
-                    MainActivity.instance.logError("Log client - Connection closed by remote host.");
+                if(!logSocket.getInetAddress().isReachable(100)){
+                    // Handle command client disconnect
+                    if(!hasRespondedToDisconnect){
+                        MainActivity.instance.logError("Log client - Connection closed by remote host.");
+                    }
+                    disconnect(false);
+                    break;
                 }
 
-                // Closed by remote endpoint
-                disconnect(false);
-                break;
-            }
-
-            try {
-                Thread.sleep(250);
-            }catch(InterruptedException e) {
-
-            }
-        }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    /// TCP Client Handlers
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    class CommandHandler extends ChannelInboundHandlerAdapter {
-        @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            // There should not be any data sent to the DS on the command port
-            MainActivity.instance.logWarning("Robot sent data over the command port. It will be ignored.");
-        }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            // Log the first failure
-            if(!hasRespondedToDisconnect) {
-                MainActivity.instance.logError("Failed to write to command port.");
-                MainActivity.instance.logDebug("Exception: " + cause.getMessage());
-            }
-            // Closed by remote endpoint
-            disconnect(false);
-        }
-    }
-
-    class NetTableHandler extends ChannelInboundHandlerAdapter {
-        @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            handleNetTableData((byte[])msg);
-        }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            // Log the first failure
-            if(!hasRespondedToDisconnect) {
-                MainActivity.instance.logError("Failed to write to net table port.");
-                MainActivity.instance.logDebug("Exception: " + cause.getMessage());
-            }
-
-            // Closed by remote endpoint
-            disconnect(false);
-        }
-    }
-
-    class LogHandler extends ChannelInboundHandlerAdapter {
-        @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            logBuffer += msg.toString();
-            if(logBuffer.indexOf('\n') != -1) {
-                String[] messages = logBuffer.split("\n");
-                int end = messages.length;
-                if(!logBuffer.endsWith("\n")) {
-                    end -= 1;
-                    logBuffer = messages[messages.length - 1];
-                }else {
-                    logBuffer = "";
+                if(netTableSocketIn.available() > 0){
+                    int len =  netTableSocketIn.available();
+                    byte[] msg = new byte[len];
+                    netTableSocketIn.read(msg);
                 }
-                for(int i = 0; i < end; ++i) {
-                    MainActivity.instance.handleRobotLog(messages[i]);
+
+                if(logSocketIn.available() > 0){
+                    int len = logSocketIn.available();
+                    byte[] msg = new byte[len];
+                    logSocketIn.read(msg);
+                    String msgStr = new String(msg, StandardCharsets.UTF_8);
+
+                    logBuffer += msgStr;
+                    if(logBuffer.indexOf('\n') != -1) {
+                        String[] messages = logBuffer.split("\n");
+                        int end = messages.length;
+                        if(!logBuffer.endsWith("\n")) {
+                            end -= 1;
+                            logBuffer = messages[messages.length - 1];
+                        }else {
+                            logBuffer = "";
+                        }
+                        for(int i = 0; i < end; ++i) {
+                            MainActivity.instance.handleRobotLog(messages[i]);
+                        }
+                    }
                 }
-            }
-        }
 
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            // Log the first failure
-            if(!hasRespondedToDisconnect) {
-                MainActivity.instance.logError("Log client error.");
-                MainActivity.instance.logDebug("Exception: " + cause.getMessage());
-            }
+                try{Thread.sleep(3);}catch (InterruptedException e) {}
 
-            // Closed by remote endpoint
-            disconnect(false);
+            }catch(IOException e){
+
+            }
         }
     }
 }
