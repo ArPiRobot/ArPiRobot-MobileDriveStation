@@ -11,7 +11,10 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final boolean ENABLE_DEBUG_LOGGING = true;
+
     public static MainActivity instance = null;
+    public NetworkManager networkManager = new NetworkManager();
 
     public String robotLogText = "";
     public String dsLogText = "";
@@ -52,5 +55,47 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void logInfo(String message) {
+
+    }
+
+    public void logDebug(String message) {
+        if(ENABLE_DEBUG_LOGGING) {
+
+        }
+    }
+
+    public void logWarning(String message) {
+
+    }
+
+    public void logError(String message) {
+
+    }
+
+    public void handleRobotLog(String line){
+
+    }
+
+    public void failedToConnectToRobot(){
+
+    }
+
+    public void connectedToRobot(){
+
+    }
+
+    public void disconnectedFromRobot(boolean userInitiated){
+
+    }
+
+    public String getRobotAddress(){
+        return prefs.getString("robotaddress", "192.168.10.1");
+    }
+
+    public String getBatteryVoltage() {
+        return prefs.getString("batvoltage", "7.5");
     }
 }
