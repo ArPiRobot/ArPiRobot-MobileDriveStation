@@ -5,13 +5,11 @@
     <EditTextPreference
         app:key="robotaddress"
         app:title="Robot address"
-        app:summary="The IP Address or hostname of the robot."
         app:defaultValue="192.168.10.1"/>
 
     <EditTextPreference
         app:key="batvoltage"
         app:title="Main Battery Voltage"
-        app:summary="The voltage of the main motor battery on the robot."
         app:defaultValue="7.5"/>
 
 </PreferenceScreen>
