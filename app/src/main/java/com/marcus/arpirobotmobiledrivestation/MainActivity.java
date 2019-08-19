@@ -10,6 +10,7 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -170,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void handleRobotLog(String line){
-        robotLogText += line;
+        robotLogText += line + "\n";
     }
 
     public void failedToConnectToRobot(){

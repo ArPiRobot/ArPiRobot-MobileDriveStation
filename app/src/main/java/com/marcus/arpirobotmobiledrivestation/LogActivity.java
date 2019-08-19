@@ -31,7 +31,9 @@ public class LogActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                if(tab.getPosition() == 0){
 
+                }
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) { }
