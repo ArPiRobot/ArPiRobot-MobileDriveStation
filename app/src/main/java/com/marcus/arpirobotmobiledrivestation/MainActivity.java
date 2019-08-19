@@ -85,12 +85,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         leftjs.setOnMoveListener((int angle, int strength) -> {
             leftx = (byte)(Math.cos(angle * Math.PI / 180.0) * strength);
-            lefty = (byte)(Math.sin(angle * Math.PI / 180.0) * strength);
+            lefty = (byte)(-1 * Math.sin(angle * Math.PI / 180.0) * strength);
         }, 20);
 
         rightjs.setOnMoveListener((int angle, int strength) -> {
             rightx = (byte)(Math.cos(angle * Math.PI / 180.0) * strength);
-            righty = (byte)(Math.sin(angle * Math.PI / 180.0) * strength);
+            righty = (byte)(-1 * Math.sin(angle * Math.PI / 180.0) * strength);
         }, 20);
 
         MainActivity.instance = this;
