@@ -103,7 +103,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/btR1"
+        android:id="@+id/btnR1"
         android:layout_width="75dp"
         android:layout_height="50dp"
         android:layout_marginEnd="23dp"
@@ -114,7 +114,7 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
-        android:id="@+id/btR2"
+        android:id="@+id/btnR2"
         android:layout_width="75dp"
         android:layout_height="50dp"
         android:layout_marginEnd="16dp"
@@ -122,7 +122,7 @@
         android:background="@drawable/gamepad_button_square"
         android:text="R2"
         app:layout_constraintBottom_toTopOf="@+id/btnY"
-        app:layout_constraintEnd_toStartOf="@+id/btR1" />
+        app:layout_constraintEnd_toStartOf="@+id/btnR1" />
 
     <Button
         android:id="@+id/btnL2"
@@ -154,7 +154,7 @@
         android:layout_marginBottom="24dp"
         android:background="@drawable/gamepad_button_square"
         android:text="Start"
-        app:layout_constraintBottom_toTopOf="@+id/jsLeft2"
+        app:layout_constraintBottom_toTopOf="@+id/jsRight"
         app:layout_constraintStart_toEndOf="@+id/textView" />
 
     <TextView
@@ -176,7 +176,7 @@
         android:layout_marginEnd="8dp"
         android:text="Enable"
         android:textColor="#00AA00"
-        app:layout_constraintEnd_toStartOf="@+id/btR2"
+        app:layout_constraintEnd_toStartOf="@+id/btnR2"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btnL2"
         app:layout_constraintTop_toTopOf="parent" />
@@ -189,7 +189,7 @@
         android:layout_marginEnd="8dp"
         android:text="Disable"
         android:textColor="#FF0000"
-        app:layout_constraintEnd_toStartOf="@+id/btR2"
+        app:layout_constraintEnd_toStartOf="@+id/btnR2"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/btnL2"
         app:layout_constraintTop_toBottomOf="@+id/btnEnable" />
@@ -210,7 +210,7 @@
         custom:layout_constraintEnd_toStartOf="@+id/textView" />
 
     <io.github.controlwear.virtual.joystick.android.JoystickView
-        android:id="@+id/jsLeft2"
+        android:id="@+id/jsRight"
         android:layout_width="125dp"
         android:layout_height="125dp"
         android:layout_marginStart="16dp"

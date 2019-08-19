@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class NetworkManager{
-    private ExecutorService asyncExecutor = Executors.newFixedThreadPool(2);
+    private ExecutorService asyncExecutor = Executors.newFixedThreadPool(3);
 
     private Socket commandSocket = null,
                          netTableSocket = null,
@@ -27,7 +27,7 @@ public class NetworkManager{
     private DatagramSocket controllerSocket = null;
 
     private OutputStream commandSocketOut, netTableSocketOut;
-    private InputStream netTableSocketIn, logSocketIn;
+    private InputStream netTableSocketIn, logSocketIn, commandSocketIn;
 
     // Networking settings
     public final static int CONTROLLER_PORT = 8090;
@@ -84,6 +84,7 @@ public class NetworkManager{
 
                 logSocketIn = logSocket.getInputStream();
                 netTableSocketIn = netTableSocket.getInputStream();
+                commandSocketIn = commandSocket.getInputStream();
 
                 // Connect UDP socket last (only if exception not thrown = all TCp connections successful)
                 controllerSocket = new DatagramSocket();
@@ -130,29 +131,33 @@ public class NetworkManager{
 
     public void sendControllerData(byte[] data) {
         if(isConnected) {
-            try {
-                controllerSocket.send(new DatagramPacket(data, data.length));
-            } catch (IOException e) {
-                // UDP channel is for some reason closed (this should never happen)
-                if(!hasRespondedToDisconnect) {
-                    MainActivity.instance.logError("Failed to write to controller port.");
+            asyncExecutor.execute(() -> {
+                try {
+                    controllerSocket.send(new DatagramPacket(data, data.length));
+                } catch (IOException e) {
+                    // UDP channel is for some reason closed (this should never happen)
+                    if(!hasRespondedToDisconnect) {
+                        MainActivity.instance.logError("Failed to write to controller port.");
+                    }
+                    disconnect(false);
                 }
-                disconnect(false);
-            }
+            });
         }
     }
 
     public void sendCommand(String command) {
         if(isConnected) {
-            try{
-                commandSocketOut.write(command.getBytes(StandardCharsets.UTF_8));
-                commandSocketOut.flush();
-            }catch(IOException e){
-                // Write failed. Disconnect.
-                if(!hasRespondedToDisconnect)
-                    MainActivity.instance.logError("Failed to write to command port.");
-                disconnect(false);
-            }
+            asyncExecutor.execute(() -> {
+                try{
+                    commandSocketOut.write(command.getBytes(StandardCharsets.UTF_8));
+                    commandSocketOut.flush();
+                }catch(IOException e){
+                    // Write failed. Disconnect.
+                    if(!hasRespondedToDisconnect)
+                        MainActivity.instance.logError("Failed to write to command port.");
+                    disconnect(false);
+                }
+            });
         }
     }
 
@@ -167,15 +172,17 @@ public class NetworkManager{
 
     public void sendNTRaw(byte[] data) {
         if(isConnected) {
-            try{
-                commandSocketOut.write(data);
-                commandSocketOut.flush();
-            }catch(IOException e){
-                // Write failed. Disconnect.
-                if(!hasRespondedToDisconnect)
-                    MainActivity.instance.logError("Failed to write to net table port.");
-                disconnect(false);
-            }
+            asyncExecutor.execute(() -> {
+                try{
+                    commandSocketOut.write(data);
+                    commandSocketOut.flush();
+                }catch(IOException e){
+                    // Write failed. Disconnect.
+                    if(!hasRespondedToDisconnect)
+                        MainActivity.instance.logError("Failed to write to net table port.");
+                    disconnect(false);
+                }
+            });
         }
     }
 
@@ -262,33 +269,10 @@ public class NetworkManager{
     private void periodicReadAndConnectivityCheck(){
         while(isConnected){
             try{
-                if(!commandSocket.getInetAddress().isReachable(100)){
-                    // Handle command client disconnect
-                    if(!hasRespondedToDisconnect){
-                        MainActivity.instance.logError("Command client - Connection closed by remote host.");
-                    }
-                    disconnect(false);
-                    break;
-                }
 
-                if(!netTableSocket.getInetAddress().isReachable(100)){
-                    // Handle command client disconnect
-                    if(!hasRespondedToDisconnect){
-                        MainActivity.instance.logError("Net table client - Connection closed by remote host.");
-                    }
-                    disconnect(false);
-                    break;
-                }
+                // TODO: Somehow check if each socket is still connected
 
-                if(!logSocket.getInetAddress().isReachable(100)){
-                    // Handle command client disconnect
-                    if(!hasRespondedToDisconnect){
-                        MainActivity.instance.logError("Log client - Connection closed by remote host.");
-                    }
-                    disconnect(false);
-                    break;
-                }
-
+                // handle data
                 if(netTableSocketIn.available() > 0){
                     int len =  netTableSocketIn.available();
                     byte[] msg = new byte[len];
