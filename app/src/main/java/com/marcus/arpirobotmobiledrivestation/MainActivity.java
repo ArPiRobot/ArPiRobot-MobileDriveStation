@@ -150,24 +150,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void logInfo(String message) {
         message = "[DS INFO]: " + message;
-        dsLogText += message;
+        dsLogText += message + "\n";
     }
 
     public void logDebug(String message) {
         if(ENABLE_DEBUG_LOGGING) {
             message = "[DS DEBUG]: " + message;
-            dsLogText += message;
+            dsLogText += message + "\n";
         }
     }
 
     public void logWarning(String message) {
         message = "[DS WARNING]: " + message;
-        dsLogText += message;
+        dsLogText += message + "\n";
     }
 
     public void logError(String message) {
         message = "[DS ERROR]: " + message;
-        dsLogText += message;
+        dsLogText += message + "\n";
     }
 
     public void handleRobotLog(String line){
