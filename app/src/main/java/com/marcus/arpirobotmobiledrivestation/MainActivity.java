@@ -5,10 +5,15 @@ import android.content.Intent;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.preference.PreferenceManager;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +21,8 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.android.material.snackbar.Snackbar;
+
+import java.nio.ByteBuffer;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -35,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View mainView;
     private Button enableButton, disableButton;
 
-    private byte leftx, lefty, rightx, righty;
+    private double leftx, lefty, rightx, righty;
 
     // Virtual gamepad views
     JoystickView leftjs, rightjs;
@@ -54,14 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
-                View.SYSTEM_UI_FLAG_FULLSCREEN);
-
-        if(true)
-            return;
-
         mainView = findViewById(R.id.mainView);
 
         enableButton = findViewById(R.id.btnEnable);
@@ -73,11 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Virtual gamepad views
         leftjs = findViewById(R.id.jsLeft);
         rightjs = findViewById(R.id.jsRight);
-        btnL2 = findViewById(R.id.btnL2);
-        btnR2 = findViewById(R.id.btnR2);
-
-        leftjs.setFixedCenter(true);
-        rightjs.setFixedCenter(true);
 
         btnA = findViewById(R.id.btnA);
         btnB = findViewById(R.id.btnB);
@@ -87,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnStart = findViewById(R.id.btnStart);
         btnL1 = findViewById(R.id.btnL1);
         btnR1 = findViewById(R.id.btnR1);
+        btnL2 = findViewById(R.id.btnL2);
+        btnR2 = findViewById(R.id.btnR2);
 
         btnDpadDown = findViewById(R.id.btnDpadDown);
         btnDpadUp = findViewById(R.id.btnDpadUp);
@@ -94,13 +90,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnDpadRight = findViewById(R.id.btnDpadRight);
 
         leftjs.setOnMoveListener((int angle, int strength) -> {
-            leftx = (byte)(Math.cos(angle * Math.PI / 180.0) * strength);
-            lefty = (byte)(-1 * Math.sin(angle * Math.PI / 180.0) * strength);
+            leftx = Math.cos(angle * Math.PI / 180.0) * strength;
+            lefty = -1 * Math.sin(angle * Math.PI / 180.0) * strength;
         }, 20);
 
         rightjs.setOnMoveListener((int angle, int strength) -> {
-            rightx = (byte)(Math.cos(angle * Math.PI / 180.0) * strength);
-            righty = (byte)(-1 * Math.sin(angle * Math.PI / 180.0) * strength);
+            rightx = Math.cos(angle * Math.PI / 180.0) * strength;
+            righty = -1 * Math.sin(angle * Math.PI / 180.0) * strength;
         }, 20);
 
         MainActivity.instance = this;
@@ -161,6 +157,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void setIndicatorPanelEnabled(boolean enabled){
+        // TODO: Prevent changing to net table activity when this is false
+    }
+
     public void logInfo(String message) {
         message = "[DS INFO]: " + message;
         dsLogText += message + "\n";
@@ -211,15 +211,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Connection to the robot was lost.");
             builder.setTitle("Disconnected");
+            builder.setPositiveButton("OK", null);
             builder.create().show();
         }
     }
 
     public void networkTableEntryChanged(String key, boolean isNew){
-
-    }
-
-    public void setIndicatorPanelEnabled(boolean enabled){
 
     }
 
@@ -248,38 +245,91 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return 0;
     }
 
+    /**
+     * Converts -100 through 100 to a 16-bit integer value to match how the PC drive station works
+     * @param percentageVal A percentage (-1.0 to 1.0) value for the axis
+     * @return A signed short representing the same value
+     */
+    private short getAxisValue(double percentageVal){
+        if(percentageVal >= 0) return (short)(percentageVal * 32767);
+        return (short)(percentageVal * 32768);
+    }
+
     private byte[] makeControllerData(){
-        byte[] data = new byte[22];
-        data[0] = 0; // controller number
+        final byte axisCount = 6;
+        final byte buttonCount = 11;
+        final byte dpadCount = 1;
 
-        // Axes need to be -100 to 100 not 0 to 100
-        data[1] = leftx;
-        data[2] = lefty;
-        data[3] = rightx;
-        data[4] = righty;
-        data[5] = (byte)(btnL2.isPressed() ? 100 : 0);
-        data[6] = (byte)(btnR2.isPressed() ? 100 : 0);
-        data[7] = 127; // 127 signed = 255 unsigned = separator
+        // Packet = controller_num, axis_count, button_count, dpad_count, 2 bytes per axis, 1 byte per 8 buttons, 1 byte per two dpads, '\n'
+        // Axes are signed shorts send across two bytes. Big endian
+        // Buttons are 1 bit per button (8 buttons per byte)
+        // Dpads are 4 bits per dpad (2 dpads per byte)
+        int packetSize = 5 + 2 * axisCount + (int)Math.ceil(buttonCount / 8.0) + (int)Math.ceil(dpadCount / 2.0);
 
-        // Buttons
-        data[8] = (byte)(btnA.isPressed() ? 0 : 1);
-        data[9] = (byte)(btnB.isPressed() ? 0 : 1);
-        data[10] = (byte)(btnX.isPressed() ? 0 : 1);
-        data[11] = (byte)(btnY.isPressed() ? 0 : 1);
-        data[12] = (byte)(btnBack.isPressed() ? 0 : 1);
-        data[13] = 0; // Guide button
-        data[14] = (byte)(btnStart.isPressed() ? 0 : 1);
-        data[15] = 0; // Left stick
-        data[16] = 0; // Right stick
-        data[17] = (byte)(btnL1.isPressed() ? 0 : 1);
-        data[18] = (byte)(btnR1.isPressed() ? 0 : 1);
-        data[19] = 127; // separator
+        ByteBuffer buffer = ByteBuffer.allocate(packetSize);
 
-        // Dpad
-        data[20] = getDpadDirection();
-        data[21] = '\n';
+        // Controller number
+        buffer.put((byte)0);
 
-        return data;
+        // Prepend counts
+        buffer.put(axisCount);
+        buffer.put(buttonCount);
+        buffer.put(dpadCount);
+
+        // Encode axes
+        buffer.putShort(getAxisValue(leftx / 100.0));
+        buffer.putShort(getAxisValue(lefty / 100.0));
+        buffer.putShort(getAxisValue(rightx / 100.0));
+        buffer.putShort(getAxisValue(righty / 100.0));
+        buffer.putShort((short)(btnL2.isPressed() ? 32767 : 0));
+        buffer.putShort((short)(btnR2.isPressed() ? 32767 : 0));
+
+        // Encode buttons
+        boolean[] buttonData = new boolean[buttonCount];
+        buttonData[0] = btnA.isPressed();
+        buttonData[1] = btnB.isPressed();
+        buttonData[2] = btnX.isPressed();
+        buttonData[3] = btnY.isPressed();
+        buttonData[4] = btnBack.isPressed();
+        buttonData[5] = false; // Guide button
+        buttonData[6] = btnStart.isPressed();
+        buttonData[7] = false; // Left stick
+        buttonData[8] = false; // Right stick
+        buttonData[9] = btnL1.isPressed();
+        buttonData[10] = btnR1.isPressed();
+
+        for(int i = 0; i < Math.ceil(buttonCount / 8.0); ++i) {
+            byte b = 0;
+            for(int j = 0; j < 8; j++) {
+                b = (byte) (b << 1); // Shift bits left
+                // Add data if still buttons
+                if(i * 8 + j < buttonCount) {
+                    b |= (buttonData[i * 8 + j] ? (byte) 1 : (byte) 0);
+                }
+            }
+            buffer.put(b);
+        }
+
+        // Encode dpad data
+        for(int i = 0; i < Math.ceil(dpadCount / 2.0); ++i) {
+            byte b = 0;
+            for(int j = 0; j < 2; j++) {
+                b = (byte) (b << 4); // Shift bits left
+                // Add data if still dpads
+                if(i * 8 + j < dpadCount) {
+                    b |= getDpadDirection();
+                }
+            }
+            buffer.put(b);
+        }
+
+        // Make it easy to identify this as the end of the packet
+        buffer.put((byte)'\n');
+
+        buffer.position(0);
+        byte[] rtnData = new byte[buffer.remaining()];
+        buffer.get(rtnData);
+        return rtnData;
     }
 
 

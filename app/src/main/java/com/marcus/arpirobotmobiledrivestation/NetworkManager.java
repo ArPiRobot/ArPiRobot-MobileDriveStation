@@ -37,9 +37,9 @@ public class NetworkManager{
     public final static int CONNECT_TIMEOUT = 5000; // ms
 
     // Commands that can be sent to the robot
-    public final static String COMMAND_ENABLE = "ENABLE";
-    public final static String COMMAND_DISABLE = "DISABLE";
-    public final static String COMMAND_NET_TABLE_SYNC = "NT_SYNC";
+    public final static String COMMAND_ENABLE = "ENABLE\n";
+    public final static String COMMAND_DISABLE = "DISABLE\n";
+    public final static String COMMAND_NET_TABLE_SYNC = "NT_SYNC\n";
 
     public final static byte[] NT_SYNC_START_DATA = new byte[] {(byte)255, (byte)255, '\n'};
     public final static byte[] NT_SYNC_STOP_DATA = new byte[] {(byte)255, (byte)255, (byte)255, '\n'};

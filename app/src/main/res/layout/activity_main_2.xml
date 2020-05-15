@@ -5,6 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/gamepad_button_square"
+        android:text="Back"
+        app:layout_constraintStart_toEndOf="@+id/jsLeft"
+        app:layout_constraintTop_toTopOf="@+id/jsLeft" />
+
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="50dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/gamepad_button_square"
+        android:text="Start"
+        app:layout_constraintEnd_toStartOf="@+id/jsRight"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/btnBack"
+        app:layout_constraintTop_toTopOf="@+id/jsRight" />
+
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/jsTopBarrier"
         android:layout_width="wrap_content"
@@ -72,32 +97,31 @@
         app:layout_constraintVertical_bias="1.0"
         app:layout_constraintWidth_max="210dp" />
 
-    <ToggleButton
-        android:id="@+id/toggleButton"
+    <Button
+        android:id="@+id/btnDisable"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
-        android:textOff="Disable"
-        android:textOn="Disable"
+        android:text="Disable"
+        android:textColor="@color/disable_btn_red"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/toggleButton2"
+        app:layout_constraintEnd_toStartOf="@+id/btnEnable"
         app:layout_constraintStart_toEndOf="@+id/jsLeft" />
 
-    <ToggleButton
-        android:id="@+id/toggleButton2"
+    <Button
+        android:id="@+id/btnEnable"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="ToggleButton"
-        android:textOff="Enable"
-        android:textOn="Enable"
+        android:text="Enable"
+        android:textColor="@color/enable_btn_green"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/jsRight"
-        app:layout_constraintStart_toEndOf="@+id/toggleButton" />
+        app:layout_constraintStart_toEndOf="@+id/btnDisable" />
 
     <LinearLayout
         android:id="@+id/dpadButtons"
@@ -294,5 +318,75 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnL2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/gamepad_button_square"
+        android:text="L2"
+        app:layout_constraintBottom_toTopOf="@+id/jsLeft"
+        app:layout_constraintStart_toEndOf="@+id/jsLeft" />
+
+    <Button
+        android:id="@+id/btnL1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/gamepad_button_square"
+        android:text="L1"
+        app:layout_constraintBottom_toTopOf="@+id/btnL2"
+        app:layout_constraintStart_toEndOf="@+id/jsLeft"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/btnR2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/gamepad_button_square"
+        android:text="R2"
+        app:layout_constraintBottom_toTopOf="@+id/jsRight"
+        app:layout_constraintEnd_toStartOf="@+id/jsRight"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/btnL2" />
+
+    <Button
+        android:id="@+id/btnR1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/gamepad_button_square"
+        android:text="R1"
+        app:layout_constraintBottom_toTopOf="@+id/btnR2"
+        app:layout_constraintEnd_toStartOf="@+id/jsRight"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/btnL1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/lblRobotStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_horizontal"
+        android:text="Not Connected"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintBottom_toTopOf="@+id/btnDisable"
+        app:layout_constraintEnd_toStartOf="@+id/jsRight"
+        app:layout_constraintStart_toEndOf="@+id/jsLeft" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
