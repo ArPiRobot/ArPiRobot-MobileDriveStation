@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/mainView">
 
     <Button
         android:id="@+id/btnBack"
@@ -244,6 +245,11 @@
             android:layout_weight="1"
             android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
             <Button
                 android:id="@+id/btnY"
                 android:layout_width="match_parent"
@@ -251,11 +257,6 @@
                 android:layout_weight="1"
                 android:background="@drawable/gamepad_button"
                 android:text="Y" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -277,6 +278,11 @@
                 android:background="@drawable/gamepad_button"
                 android:text="X" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
             <Button
                 android:id="@+id/btnB"
                 android:layout_width="match_parent"
@@ -284,11 +290,6 @@
                 android:layout_weight="1"
                 android:background="@drawable/gamepad_button"
                 android:text="B" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
 
         </LinearLayout>
 
@@ -298,6 +299,11 @@
             android:layout_weight="1"
             android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
             <Button
                 android:id="@+id/btnA"
                 android:layout_width="match_parent"
@@ -305,11 +311,6 @@
                 android:layout_weight="1"
                 android:background="@drawable/gamepad_button"
                 android:text="A" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
 
             <TextView
                 android:layout_width="match_parent"

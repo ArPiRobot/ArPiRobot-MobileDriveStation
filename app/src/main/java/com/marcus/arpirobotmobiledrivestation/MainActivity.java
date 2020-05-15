@@ -26,6 +26,7 @@ import android.widget.TextView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MenuItem connectMenuItem = null, disconnectMenuItem = null;
     private View mainView;
     private Button enableButton, disableButton;
-    private TextView mainBatteryLabel;
+    private TextView mainBatteryLabel, robotStateLabel;
 
     private double leftx, lefty, rightx, righty;
 
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         disableButton.setOnClickListener(this);
 
         mainBatteryLabel = findViewById(R.id.lblMainBat);
+        robotStateLabel = findViewById(R.id.lblRobotStatus);
 
         // Virtual gamepad views
         leftjs = findViewById(R.id.jsLeft);
@@ -230,6 +232,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         logInfo("Connected to robot.");
 
+        robotStateLabel.setText("Unknown");
+
         connectMenuItem.setVisible(false);
         disconnectMenuItem.setVisible(true);
 
@@ -247,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 syncProgressDialog.hide();
                 syncProgressDialog = null;
             }
+            robotStateLabel.setText("Not Connected");
         });
 
         logInfo("Disconnected from robot.");
@@ -300,6 +305,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(key.equals("vbat0")){
             String value = netTable.get(key);
             updateBatteryVoltage(value);
+        }else if(key.equals("robotstate")){
+            String value = netTable.get(key);
+            if(value.equals("ENABLED")){
+                robotStateLabel.setText("Enabled");
+            }else if(value.equals("DISABLED")){
+                robotStateLabel.setText("Disabled");
+            }else{
+                robotStateLabel.setText("Unknown");
+            }
+        }else{
+            NetworkTableViewActivity.updateKey(key);
         }
     }
 
