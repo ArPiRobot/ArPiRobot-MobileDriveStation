@@ -15,10 +15,12 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -157,16 +159,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
+    ProgressDialog syncProgressDialog = null;
     public void setIndicatorPanelEnabled(boolean enabled){
-        // TODO: Prevent changing to net table activity when this is false
+        if(enabled) {
+            runOnUiThread(() -> {
+                if (syncProgressDialog != null){
+                    syncProgressDialog.hide();
+                    syncProgressDialog = null;
+                }
+            });
+        }else{
+            runOnUiThread(() -> {
+                syncProgressDialog = new ProgressDialog(this);
+                syncProgressDialog.setTitle("Net Table Sync");
+                syncProgressDialog.setMessage("Network table sync in progress...");
+                syncProgressDialog.setCancelable(false);
+                syncProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                syncProgressDialog.show();
+            });
+        }
     }
 
     public void logInfo(String message) {
+        Log.i("[DS INFO]", message);
         message = "[DS INFO]: " + message;
         dsLogText += message + "\n";
     }
 
     public void logDebug(String message) {
+        Log.d("[DS DEBUG]", message);
         if(ENABLE_DEBUG_LOGGING) {
             message = "[DS DEBUG]: " + message;
             dsLogText += message + "\n";
@@ -174,11 +196,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void logWarning(String message) {
+        Log.w("[DS WARNING]", message);
         message = "[DS WARNING]: " + message;
         dsLogText += message + "\n";
     }
 
     public void logError(String message) {
+        Log.e("[DS ERROR]", message);
         message = "[DS ERROR]: " + message;
         dsLogText += message + "\n";
     }
@@ -194,15 +218,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void connectedToRobot(){
 
+        logInfo("Connected to robot.");
+
         connectMenuItem.setVisible(false);
         disconnectMenuItem.setVisible(true);
 
         connectProgressDialog.hide();
 
+        networkManager.sendCommand(NetworkManager.COMMAND_NET_TABLE_SYNC);
+
         new ControllerDataSendThread().start();
     }
 
     public void disconnectedFromRobot(boolean userInitiated){
+
+        runOnUiThread(() -> {
+            if(syncProgressDialog != null){
+                syncProgressDialog.hide();
+                syncProgressDialog = null;
+            }
+        });
+
+        logInfo("Disconnected from robot.");
 
         connectMenuItem.setVisible(true);
         disconnectMenuItem.setVisible(false);

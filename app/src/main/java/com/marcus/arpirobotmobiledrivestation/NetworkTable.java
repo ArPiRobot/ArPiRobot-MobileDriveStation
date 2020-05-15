@@ -12,8 +12,8 @@ public class NetworkTable {
 
     public void startSync() {
         if(!modifiable) return; // Already syncing if not modifiable
-        MainActivity.instance.logInfo("Starting network table sync.");
         MainActivity.instance.setIndicatorPanelEnabled(false);
+        MainActivity.instance.logInfo("Starting network table sync.");
         modifiable = false;
     }
 
@@ -40,11 +40,13 @@ public class NetworkTable {
             }
 
             MainActivity.instance.logDebug("Done syncing from DS to robot.");
-            MainActivity.instance.logInfo("Network table sync complete.");
 
             // End the sync operation
             MainActivity.instance.networkManager.sendNTRaw(NetworkManager.NT_SYNC_STOP_DATA);
             MainActivity.instance.setIndicatorPanelEnabled(true);
+
+            MainActivity.instance.logInfo("Network table sync complete.");
+
         }catch(Exception e) {
             e.printStackTrace();
         }finally {

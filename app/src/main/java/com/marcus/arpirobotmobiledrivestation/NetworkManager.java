@@ -174,8 +174,8 @@ public class NetworkManager{
         if(isConnected) {
             asyncExecutor.execute(() -> {
                 try{
-                    commandSocketOut.write(data);
-                    commandSocketOut.flush();
+                    netTableSocketOut.write(data);
+                    netTableSocketOut.flush();
                 }catch(IOException e){
                     // Write failed. Disconnect.
                     if(!hasRespondedToDisconnect)
@@ -277,6 +277,7 @@ public class NetworkManager{
                     int len =  netTableSocketIn.available();
                     byte[] msg = new byte[len];
                     netTableSocketIn.read(msg);
+                    handleNetTableData(msg);
                 }
 
                 if(logSocketIn.available() > 0){
