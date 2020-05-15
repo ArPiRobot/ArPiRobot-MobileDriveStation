@@ -218,8 +218,9 @@ public class NetworkManager{
     }
 
     private void handleNetTableData(byte[] newData) {
-        List<Byte> newDataList = Bytes.asList(newData);
-        netTableReadBuffer.addAll(newDataList);
+        for(byte b : newData){
+            netTableReadBuffer.add(b);
+        }
 
         int endPos = -1;
 

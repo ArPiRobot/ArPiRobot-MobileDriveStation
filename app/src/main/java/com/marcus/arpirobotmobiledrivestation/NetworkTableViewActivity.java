@@ -96,6 +96,13 @@ public class NetworkTableViewActivity extends AppCompatActivity {
                     builder.setCancelable(true);
                     builder.create().show();
                 }
+                return true;
+            case R.id.mnuNtClear:
+                synchronized (keyLock){
+                    existingKeys.addAll(keysInUi);
+                    keysInUi.clear();
+                    rvAdapter.notifyDataSetChanged();
+                }
             default:
                 return super.onOptionsItemSelected(item);
         }
