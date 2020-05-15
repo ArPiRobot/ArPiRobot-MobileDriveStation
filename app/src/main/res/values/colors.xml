@@ -6,4 +6,9 @@
 
     <color name="disable_btn_red">#CC0000</color>
     <color name="enable_btn_green">#00CC00</color>
+
+    <color name="battery_green">#00c800</color>
+    <color name="battery_yellow">#e6e600</color>
+    <color name="battery_orange">#ff9900</color>
+    <color name="battery_red">#c80000</color>
 </resources>

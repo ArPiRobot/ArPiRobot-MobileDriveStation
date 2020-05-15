@@ -14,7 +14,7 @@
         android:background="@drawable/gamepad_button_square"
         android:text="Back"
         app:layout_constraintStart_toEndOf="@+id/jsLeft"
-        app:layout_constraintTop_toTopOf="@+id/jsLeft" />
+        app:layout_constraintTop_toBottomOf="@+id/btnL2" />
 
     <Button
         android:id="@+id/btnStart"
@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toStartOf="@+id/jsRight"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/btnBack"
-        app:layout_constraintTop_toTopOf="@+id/jsRight" />
+        app:layout_constraintTop_toBottomOf="@+id/btnR2" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/jsTopBarrier"
@@ -233,21 +233,16 @@
         app:layout_constraintBottom_toTopOf="@+id/jsRight"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/jsRight"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        app:layout_constraintHorizontal_bias="1.0">
+        app:layout_constraintVertical_bias="1.0">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
 
             <Button
                 android:id="@+id/btnY"
@@ -256,6 +251,11 @@
                 android:layout_weight="1"
                 android:background="@drawable/gamepad_button"
                 android:text="Y" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -277,11 +277,6 @@
                 android:background="@drawable/gamepad_button"
                 android:text="X" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
             <Button
                 android:id="@+id/btnB"
                 android:layout_width="match_parent"
@@ -289,6 +284,11 @@
                 android:layout_weight="1"
                 android:background="@drawable/gamepad_button"
                 android:text="B" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
         </LinearLayout>
 
@@ -298,11 +298,6 @@
             android:layout_weight="1"
             android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
             <Button
                 android:id="@+id/btnA"
                 android:layout_width="match_parent"
@@ -310,6 +305,11 @@
                 android:layout_weight="1"
                 android:background="@drawable/gamepad_button"
                 android:text="A" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -324,56 +324,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/gamepad_button_square"
         android:text="L2"
-        app:layout_constraintBottom_toTopOf="@+id/jsLeft"
-        app:layout_constraintStart_toEndOf="@+id/jsLeft" />
+        app:layout_constraintStart_toEndOf="@+id/jsLeft"
+        app:layout_constraintTop_toBottomOf="@+id/btnL1" />
 
     <Button
         android:id="@+id/btnL1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
         android:background="@drawable/gamepad_button_square"
         android:text="L1"
-        app:layout_constraintBottom_toTopOf="@+id/btnL2"
         app:layout_constraintStart_toEndOf="@+id/jsLeft"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="@+id/dpadButtons" />
 
     <Button
         android:id="@+id/btnR2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
         android:background="@drawable/gamepad_button_square"
         android:text="R2"
-        app:layout_constraintBottom_toTopOf="@+id/jsRight"
         app:layout_constraintEnd_toStartOf="@+id/jsRight"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/btnL2" />
+        app:layout_constraintStart_toEndOf="@+id/btnL2"
+        app:layout_constraintTop_toBottomOf="@+id/btnR1" />
 
     <Button
         android:id="@+id/btnR1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
         android:background="@drawable/gamepad_button_square"
         android:text="R1"
-        app:layout_constraintBottom_toTopOf="@+id/btnR2"
         app:layout_constraintEnd_toStartOf="@+id/jsRight"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/btnL1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="@+id/letterButtons" />
 
     <TextView
         android:id="@+id/lblRobotStatus"
@@ -386,6 +378,21 @@
         android:text="Not Connected"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         app:layout_constraintBottom_toTopOf="@+id/btnDisable"
+        app:layout_constraintEnd_toStartOf="@+id/jsRight"
+        app:layout_constraintStart_toEndOf="@+id/jsLeft" />
+
+    <TextView
+        android:id="@+id/lblMainBat"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/battery_red"
+        android:gravity="center_horizontal"
+        android:text="0.0 V"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintBottom_toTopOf="@+id/lblRobotStatus"
         app:layout_constraintEnd_toStartOf="@+id/jsRight"
         app:layout_constraintStart_toEndOf="@+id/jsLeft" />
 

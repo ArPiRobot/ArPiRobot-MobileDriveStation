@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MenuItem connectMenuItem = null, disconnectMenuItem = null;
     private View mainView;
     private Button enableButton, disableButton;
+    private TextView mainBatteryLabel;
 
     private double leftx, lefty, rightx, righty;
 
@@ -70,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         enableButton.setOnClickListener(this);
         disableButton.setOnClickListener(this);
+
+        mainBatteryLabel = findViewById(R.id.lblMainBat);
 
         // Virtual gamepad views
         leftjs = findViewById(R.id.jsLeft);
@@ -103,6 +107,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         MainActivity.instance = this;
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshBatteryVoltageIndicator();
     }
 
     @Override
@@ -253,16 +263,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void networkTableEntryChanged(String key, boolean isNew){
+    /**
+     * Update the color of the main battery voltage indicator without changing the value of label.
+     */
+    public void refreshBatteryVoltageIndicator() {
+        updateBatteryVoltage(mainBatteryLabel.getText().toString().replace("V", ""));
+    }
 
+    /**
+     * Set a new battery voltage to display. This will also adjust the background color of the label based on the new value.
+     * @param value The new battery voltage (as a string received over the network)
+     */
+    public void updateBatteryVoltage(String value) {
+        try {
+            mainBatteryLabel.setText(value + "V");
+            double voltage = Double.parseDouble(value);
+
+            double mainBatVoltagePreference = getBatteryVoltage();
+
+            if (voltage >= mainBatVoltagePreference) {
+                mainBatteryLabel.setBackgroundColor(ContextCompat.getColor(this, R.color.battery_green));
+            } else if (voltage >= (mainBatVoltagePreference * 0.85)) {
+                mainBatteryLabel.setBackgroundColor(ContextCompat.getColor(this, R.color.battery_yellow));
+            } else if (voltage >= (mainBatVoltagePreference * 0.7)) {
+                mainBatteryLabel.setBackgroundColor(ContextCompat.getColor(this, R.color.battery_orange));
+            } else {
+                mainBatteryLabel.setBackgroundColor(ContextCompat.getColor(this, R.color.battery_red));
+            }
+
+        } catch (NumberFormatException e) {
+            mainBatteryLabel.setBackgroundColor(ContextCompat.getColor(this, R.color.battery_red));
+        }
+    }
+
+    public void networkTableEntryChanged(String key, boolean isNew){
+        if(key.equals("vbat0")){
+            String value = netTable.get(key);
+            updateBatteryVoltage(value);
+        }
     }
 
     public String getRobotAddress(){
         return prefs.getString("robotaddress", "192.168.10.1");
     }
 
-    public String getBatteryVoltage() {
-        return prefs.getString("batvoltage", "7.5");
+    public double getBatteryVoltage() {
+        return prefs.getFloat("batvoltage", 7.5f);
     }
 
     private byte getDpadDirection(){

@@ -32,14 +32,18 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         });
 
         final EditTextPreference batPreference = (EditTextPreference) findPreference("batvoltage");
-        batPreference.setSummary(prefs.getString("batvoltage", "7.5"));
+        batPreference.setSummary(prefs.getFloat("batvoltage", 7.5f) + "");
         batPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
 
                 String yourString = o.toString();
-                prefs.edit().putString("batvoltage", yourString).apply();
-                batPreference.setSummary(yourString);
+                try {
+                    prefs.edit().putFloat("batvoltage", Float.parseFloat(yourString)).apply();
+                }catch(NumberFormatException e){
+                    prefs.edit().putFloat("batvoltage", 7.5f).apply();
+                }
+                batPreference.setSummary(prefs.getFloat("batvoltage", 7.5f) + "");
 
                 return true;
             }
