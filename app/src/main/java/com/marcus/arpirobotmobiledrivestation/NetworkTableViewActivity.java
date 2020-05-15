@@ -1,27 +1,22 @@
 package com.marcus.arpirobotmobiledrivestation;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceFragmentCompat;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
-
-public class SettingsActivity extends AppCompatActivity {
+public class NetworkTableViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_network_table_view);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        setContentView(R.layout.activity_settings);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.preferences_container, new MySettingsFragment())
-                .commit();
 
-        setTitle(R.string.settings_title);
-
+        setTitle(R.string.nettable_title);
     }
 
     @Override
@@ -33,5 +28,12 @@ public class SettingsActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //TODO: Fix this
+        Log.i("ARPIROBOTDS", "Count = " + MainActivity.instance.netTable.getKeys().size());
     }
 }

@@ -2,27 +2,27 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/mainView"
     tools:context=".MainActivity">
 
     <Button
         android:id="@+id/btnA"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="82dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginEnd="66dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/gamepad_button"
         android:text="A"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/jsRight"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/btnY"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="82dp"
+        android:layout_marginEnd="66dp"
         android:layout_marginBottom="50dp"
         android:background="@drawable/gamepad_button"
         android:text="Y"
@@ -33,27 +33,30 @@
         android:id="@+id/btnB"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="32dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="66dp"
         android:background="@drawable/gamepad_button"
         android:text="B"
-        app:layout_constraintBottom_toTopOf="@+id/btnA"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/jsRight"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnY" />
 
     <Button
         android:id="@+id/btnX"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="132dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="66dp"
         android:background="@drawable/gamepad_button"
         android:text="X"
-        app:layout_constraintBottom_toTopOf="@+id/btnA"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/jsRight"
+        app:layout_constraintEnd_toStartOf="@+id/btnB" />
 
     <Button
         android:id="@+id/btnDpadUp"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="82dp"
+        android:layout_marginStart="66dp"
         android:layout_marginBottom="50dp"
         android:background="@drawable/gamepad_button"
         android:text="▲"
@@ -64,164 +67,159 @@
         android:id="@+id/btnDpadDown"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="82dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginStart="66dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/gamepad_button"
         android:text="▼"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/jsLeft"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnDpadLeft"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="66dp"
         android:background="@drawable/gamepad_button"
         android:text="◄"
-        app:layout_constraintBottom_toTopOf="@+id/btnDpadDown"
+        app:layout_constraintBottom_toTopOf="@+id/jsLeft"
+        app:layout_constraintEnd_toStartOf="@+id/btnDpadUp"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnDpadRight"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="132dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginBottom="66dp"
         android:background="@drawable/gamepad_button"
         android:text="►"
-        app:layout_constraintBottom_toTopOf="@+id/btnDpadDown"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/jsLeft"
+        app:layout_constraintStart_toEndOf="@+id/btnDpadLeft" />
 
     <Button
         android:id="@+id/btnL1"
         android:layout_width="75dp"
         android:layout_height="50dp"
-        android:layout_marginStart="23dp"
+        android:layout_marginStart="32dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/gamepad_button_square"
         android:text="L1"
-        app:layout_constraintBottom_toTopOf="@+id/btnDpadUp"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/btnL2"
+        app:layout_constraintStart_toEndOf="@+id/btnDpadRight" />
 
     <Button
         android:id="@+id/btnR1"
         android:layout_width="75dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="23dp"
+        android:layout_marginEnd="32dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/gamepad_button_square"
         android:text="R1"
-        app:layout_constraintBottom_toTopOf="@+id/btnY"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/btnR2"
+        app:layout_constraintEnd_toStartOf="@+id/btnX" />
 
     <Button
         android:id="@+id/btnR2"
         android:layout_width="75dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="32dp"
         android:background="@drawable/gamepad_button_square"
         android:text="R2"
-        app:layout_constraintBottom_toTopOf="@+id/btnY"
-        app:layout_constraintEnd_toStartOf="@+id/btnR1" />
+        app:layout_constraintBottom_toBottomOf="@+id/btnX"
+        app:layout_constraintEnd_toStartOf="@+id/btnX" />
 
     <Button
         android:id="@+id/btnL2"
         android:layout_width="75dp"
         android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="32dp"
         android:background="@drawable/gamepad_button_square"
         android:text="L2"
-        app:layout_constraintBottom_toTopOf="@+id/btnDpadUp"
-        app:layout_constraintStart_toEndOf="@+id/btnL1" />
+        app:layout_constraintBottom_toBottomOf="@+id/btnDpadRight"
+        app:layout_constraintStart_toEndOf="@+id/btnDpadRight" />
 
     <Button
         android:id="@+id/btnBack"
         android:layout_width="50dp"
         android:layout_height="25dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginStart="32dp"
         android:background="@drawable/gamepad_button_square"
         android:text="Back"
-        app:layout_constraintBottom_toTopOf="@+id/jsLeft"
-        app:layout_constraintEnd_toStartOf="@+id/textView" />
+        app:layout_constraintStart_toEndOf="@+id/jsLeft"
+        app:layout_constraintTop_toTopOf="@+id/jsLeft" />
 
     <Button
         android:id="@+id/btnStart"
         android:layout_width="50dp"
         android:layout_height="25dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="32dp"
         android:background="@drawable/gamepad_button_square"
         android:text="Start"
-        app:layout_constraintBottom_toTopOf="@+id/jsRight"
-        app:layout_constraintStart_toEndOf="@+id/textView" />
+        app:layout_constraintEnd_toStartOf="@+id/jsRight"
+        app:layout_constraintTop_toTopOf="@+id/jsRight" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnX"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnDpadRight"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
+    <ToggleButton
         android:id="@+id/btnEnable"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:checked="false"
         android:text="Enable"
         android:textColor="#00AA00"
-        app:layout_constraintEnd_toStartOf="@+id/btnR2"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnL2"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textOff="Enable"
+        android:textOn="Enable"
+        app:layout_constraintBottom_toTopOf="@+id/btnDisable"
+        app:layout_constraintEnd_toStartOf="@+id/jsRight"
+        app:layout_constraintStart_toEndOf="@+id/jsLeft" />
 
-    <Button
+    <ToggleButton
         android:id="@+id/btnDisable"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:checked="true"
         android:text="Disable"
         android:textColor="#FF0000"
-        app:layout_constraintEnd_toStartOf="@+id/btnR2"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/btnL2"
-        app:layout_constraintTop_toBottomOf="@+id/btnEnable" />
+        android:textOff="Disable"
+        android:textOn="Disable"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/jsRight"
+        app:layout_constraintStart_toEndOf="@+id/jsLeft" />
 
-    <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/jsLeft"
-        android:layout_width="125dp"
-        android:layout_height="125dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="24dp"
-        custom:JV_backgroundColor="#009688"
-        custom:JV_borderColor="#00796B"
-        custom:JV_borderWidth="4dp"
-        custom:JV_buttonColor="#FF6E40"
-        custom:JV_buttonSizeRatio="15%"
-        custom:JV_fixedCenter="false"
-        custom:layout_constraintBottom_toBottomOf="parent"
-        custom:layout_constraintEnd_toStartOf="@+id/textView" />
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="left" />
 
     <io.github.controlwear.virtual.joystick.android.JoystickView
-        android:id="@+id/jsRight"
-        android:layout_width="125dp"
-        android:layout_height="125dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="24dp"
-        app:JV_backgroundColor="#009688"
-        app:JV_borderColor="#00796B"
+        android:id="@+id/jsLeft"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
+        app:JV_backgroundColor="@color/colorPrimary"
+        app:JV_borderColor="@color/colorPrimaryDark"
         app:JV_borderWidth="4dp"
-        app:JV_buttonColor="#FF6E40"
+        app:JV_buttonColor="@color/colorAccent"
         app:JV_buttonSizeRatio="15%"
         app:JV_fixedCenter="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <io.github.controlwear.virtual.joystick.android.JoystickView
+        android:id="@+id/jsRight"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
+        app:JV_backgroundColor="@color/colorPrimary"
+        app:JV_borderColor="@color/colorPrimaryDark"
+        app:JV_borderWidth="4dp"
+        app:JV_buttonColor="@color/colorAccent"
+        app:JV_buttonSizeRatio="15%"
+        app:JV_fixedCenter="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,7 +10,6 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,12 +47,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_2);
 
         if(MainActivity.instance != null){
             finish();
             return;
         }
+
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+                View.SYSTEM_UI_FLAG_FULLSCREEN);
+
+        if(true)
+            return;
 
         mainView = findViewById(R.id.mainView);
 
@@ -68,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rightjs = findViewById(R.id.jsRight);
         btnL2 = findViewById(R.id.btnL2);
         btnR2 = findViewById(R.id.btnR2);
+
+        leftjs.setFixedCenter(true);
+        rightjs.setFixedCenter(true);
 
         btnA = findViewById(R.id.btnA);
         btnB = findViewById(R.id.btnB);
@@ -130,6 +140,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             case R.id.mnuDisconnect:
                 networkManager.disconnect(true);
+                return true;
+            case R.id.mnuNetTable:
+                startActivity(new Intent(this, NetworkTableViewActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -40,6 +40,8 @@ public class LogActivity extends AppCompatActivity {
             @Override
             public void onTabReselected(TabLayout.Tab tab) { }
         });
+
+        setTitle(R.string.log_title);
     }
 
     @Override

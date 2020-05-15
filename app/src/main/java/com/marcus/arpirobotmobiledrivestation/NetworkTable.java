@@ -80,6 +80,10 @@ public class NetworkTable {
         }
     }
 
+    ArrayList<String> getKeys(){
+        return new ArrayList<>(values.keySet());
+    }
+
     public void setFromUI(String key, String value) {
         if(!modifiable) return;
         try {

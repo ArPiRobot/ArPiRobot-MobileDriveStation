@@ -14,6 +14,11 @@
         android:visible="false"
         app:showAsAction="always" />
     <item
+        android:id="@+id/mnuNetTable"
+        android:icon="@drawable/ic_nettable"
+        android:title="@string/nettable"
+        app:showAsAction="ifRoom"/>
+    <item
         android:id="@+id/mnuLog"
         android:icon="@drawable/ic_logfile"
         android:title="@string/log"
