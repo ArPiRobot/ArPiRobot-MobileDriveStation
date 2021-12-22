@@ -324,7 +324,7 @@ public class NetworkManager{
 
                 try{Thread.sleep(3);}catch (InterruptedException e) {}
 
-            }catch(IOException e){
+            }catch(Exception e){
 
             }
         }
