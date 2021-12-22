@@ -21,6 +21,7 @@ package com.marcus.arpirobotmobiledrivestation;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
@@ -28,8 +29,6 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 
 public class MySettingsFragment extends PreferenceFragmentCompat {
-
-    private SharedPreferences prefs;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -51,18 +50,18 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         });
 
         final EditTextPreference batPreference = (EditTextPreference) findPreference("batvoltage");
-        batPreference.setSummary(prefs.getFloat("batvoltage", 7.5f) + "");
+        batPreference.setSummary(prefs.getString("batvoltage", "7.5") + " V");
         batPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object o) {
 
                 String yourString = o.toString();
                 try {
-                    prefs.edit().putFloat("batvoltage", Float.parseFloat(yourString)).apply();
+                    prefs.edit().putString("batvoltage", Float.parseFloat(yourString) + "").apply();
                 }catch(NumberFormatException e){
-                    prefs.edit().putFloat("batvoltage", 7.5f).apply();
+                    prefs.edit().putString("batvoltage", "7.5").apply();
                 }
-                batPreference.setSummary(prefs.getFloat("batvoltage", 7.5f) + "");
+                batPreference.setSummary(prefs.getString("batvoltage", "7.5") + " V");
 
                 return true;
             }

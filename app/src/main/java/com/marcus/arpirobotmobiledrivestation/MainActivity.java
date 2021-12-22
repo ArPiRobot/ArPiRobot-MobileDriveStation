@@ -343,7 +343,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public double getBatteryVoltage() {
-        return prefs.getFloat("batvoltage", 7.5f);
+        String strVal = prefs.getString("batvoltage", "7.5");
+        try{
+            return Double.parseDouble(strVal);
+        }catch(NumberFormatException e){
+            return 7.5;
+        }
     }
 
     private byte getDpadDirection(){
