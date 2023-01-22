@@ -17,16 +17,16 @@
             android:screenOrientation="sensorLandscape"/>
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="sensorLandscape">
+            android:screenOrientation="sensorLandscape"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".AboutActivity"
-            android:screenOrientation="sensorLandscape" />
+            android:screenOrientation="sensorLandscape"/>
         <activity
             android:name=".SettingsActivity"
             android:screenOrientation="sensorLandscape" />
