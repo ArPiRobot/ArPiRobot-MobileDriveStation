@@ -20,8 +20,14 @@
 package com.marcus.arpirobotmobiledrivestation;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.TextView;
 
 public class AboutActivity extends AppCompatActivity {
 
@@ -34,6 +40,20 @@ public class AboutActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         setTitle(R.string.about_title);
+
+        TextView txt_about_title = findViewById(R.id.txt_about_title);
+        txt_about_title.setText(txt_about_title.getText() + BuildConfig.VERSION_NAME);
+
+        WebView web_main = findViewById(R.id.web_main);
+        web_main.loadUrl("file:///android_res/raw/about_info.html");
+        web_main.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, request.getUrl());
+                view.getContext().startActivity(intent);
+                return true;
+            }
+        });
     }
 
     @Override
